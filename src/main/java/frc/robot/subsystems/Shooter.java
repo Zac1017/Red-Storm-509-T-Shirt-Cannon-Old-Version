@@ -15,57 +15,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
-    
-    
-    private final TalonFX kRotationMotor = new TalonFX(4);
-    private final TalonFX kElevationMotor = new TalonFX(5);   
 
     public final Solenoid kLeftChamberTankSolenoid = new Solenoid(0, PneumaticsModuleType.CTREPCM, 0); // new Solenoid(module, PneumaticsModuleType, channel);
     public final Solenoid kRightChamberTankSolenoid = new Solenoid(0, PneumaticsModuleType.CTREPCM, 1);
     public final Solenoid kSealSolenoid = new Solenoid(0, PneumaticsModuleType.CTREPCM, 2);
 
-    public boolean hasZeroedPosition = false;
-    public double zeroPosition;
-    public double targetElevation;
-    public double globalRotation;
-    public int barrelIndex = 0;
     
-    //two open close (chambers)
-    //two push (seal)
 
-    private final PositionDutyCycle closedLoop = new PositionDutyCycle(0.0d).withEnableFOC(false);
-    private final VoltageOut openLoop = new VoltageOut(0.0d);
-    
     public Shooter() {
-        
-        TalonFXConfiguration rotationMotorConfig = new TalonFXConfiguration();
-        
-        rotationMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-        rotationMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        
-        // rotationMotorConfig.Slot0.kP = Constants.DriveConstants.PIDConstants.Drive.kDriveP;
-        // rotationMotorConfig.Slot0.kI = Constants.DriveConstants.PIDConstants.Drive.kDriveI;
-        // rotationMotorConfig.Slot0.kD = Constants.DriveConstants.PIDConstants.Drive.kDriveD;
-        
-        rotationMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        rotationMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        rotationMotorConfig.Feedback.SensorToMechanismRatio = Constants.ShooterConstants.kGearRatio;
-        
-        TalonFXConfiguration elevationMotorConfig = new TalonFXConfiguration(); 
-
-        elevationMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-        elevationMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-
-        // elevationMotorConfig.Slot0.kP = Constants.DriveConstants.PIDConstants.Drive.kDriveP;
-        // elevationMotorConfig.Slot0.kI = Constants.DriveConstants.PIDConstants.Drive.kDriveI;
-        // elevationMotorConfig.Slot0.kD = Constants.DriveConstants.PIDConstants.Drive.kDriveD;
-
-        elevationMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        elevationMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        
-        kRotationMotor.getConfigurator().apply(rotationMotorConfig);
-        kElevationMotor.getConfigurator().apply(elevationMotorConfig);
-
     }
 
     /**
@@ -84,57 +41,7 @@ public class Shooter extends SubsystemBase {
         solenoid.set(false);
     }
 
-    /**
-     * Rotates barrel "angle" amount of degrees
-     * @param angle
-     */
-    public void rotateToNextBarrel(double angle) {
-        if (!hasZeroedPosition) {
-            return;
-        }
-
-        kRotationMotor.setControl(closedLoop.withPosition(((globalRotation += angle) / 360.0d)));
-        barrelIndex ++;
-
-        if (barrelIndex >= Constants.ShooterConstants.kBarrelCount) {
-            barrelIndex = 0;
-        }
-    }
-
-    public boolean isReadyToFire() {
-        return isRotated() && isElevated() && hasZeroedPosition;
-    }
-
-    /**
-     * Elevates shooter to "elevation" height in meters
-     * @param elevation
-     */
-    public void elevateShooter(double elevation){
-        targetElevation = elevation;
-
-        kElevationMotor.setControl(closedLoop.withPosition((elevation / 360.0d)));
-    }
     
-    /**
-     * Zeroing the barrel
-     */
-    public void zeroBarrel() {
-        if (!hasZeroedPosition) {
-            double current = Math.abs(kRotationMotor.getTorqueCurrent().getValueAsDouble());
-
-            if (current > Constants.ShooterConstants.zeroeCurrentThreshold) {
-                kRotationMotor.setControl(openLoop.withOutput(0));
-                kRotationMotor.setPosition(0);
-                globalRotation = 0;
-                // zeroPosition = kRotationMotor.getPosition().getValueAsDouble();
-                hasZeroedPosition = true;
-                barrelIndex = 0;
-            } else {
-                kRotationMotor.setControl(openLoop.withOutput(Constants.ShooterConstants.zeroVoltage));
-            }
-
-        }
-    }
 
     // public boolean isAtPressure(double pressureThreshold) {
     //     // double pressure = pressureSensor.getPressure(); 
@@ -145,25 +52,18 @@ public class Shooter extends SubsystemBase {
     //     return pressureSensor.getPressure();
     // }
 
-    public boolean isRotated() {
-        double currentRotation = kRotationMotor.getPosition().getValueAsDouble();
-
-        double targetRotation = (globalRotation / 360.0d);
-
-        return Math.abs(currentRotation - targetRotation) < 0.02;
-    }
-
-    public boolean isElevated() {
-        double currentPosition = kElevationMotor.getPosition().getValueAsDouble();
-
-        double targetPosition = (targetElevation / 360.0d);
-
-        return Math.abs(currentPosition - targetPosition) < 0.02; // 0.02 for tolerance
-    }
 
     public void openChamber() {
         open(kLeftChamberTankSolenoid);
         open(kRightChamberTankSolenoid);
+    }
+
+    public void openRightChamber() {
+        open(kRightChamberTankSolenoid);
+    }
+
+    public void openLeftChamber() {
+        open(kLeftChamberTankSolenoid);
     }
 
     public void closeChamber() {
@@ -175,22 +75,10 @@ public class Shooter extends SubsystemBase {
         close(kSealSolenoid);
     }
 
-    public void stopMotors() {
-        kRotationMotor.setControl(openLoop.withOutput(0));
-        kElevationMotor.setControl(openLoop.withOutput(0));
-    }
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Shooter Zeroed", hasZeroedPosition);
-        SmartDashboard.putNumber("Shooter Rotation (degrees)", 
-            kRotationMotor.getPosition().getValueAsDouble() * 360.0d);
-        SmartDashboard.putNumber("Shooter Elevation", 
-            kElevationMotor.getPosition().getValueAsDouble() * 360.0d);
-        SmartDashboard.putNumber("Shooter Global Rotation", globalRotation);
-        SmartDashboard.putNumber("Shooter Barrel Index", barrelIndex);
-        
-        zeroBarrel();
+      
     }
 }
 

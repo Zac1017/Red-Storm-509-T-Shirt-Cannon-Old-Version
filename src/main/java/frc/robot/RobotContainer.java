@@ -5,12 +5,11 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.DefaultMecanumDriveCommand;
 import frc.robot.commands.ShooterCommand;
 import frc.robot.subsystems.MecanumDrive;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.TankDriveTalon;
+
 
 import java.util.function.BooleanSupplier;
 
@@ -28,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final TankDriveTalon tankDrive = new TankDriveTalon();
+
   Pigeon2 pigeon = new Pigeon2(0);
   private final MecanumDrive mecanum = new MecanumDrive(pigeon);
   private final Shooter shooter = new Shooter();
@@ -70,22 +69,22 @@ public class RobotContainer {
     ));
 
     operatorController.a().onTrue(
-      new ShooterCommand(shooter, Constants.ShooterConstants.Elevation.kElevationA)
+      new ShooterCommand(shooter)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
     );
 
     operatorController.b().onTrue(
-      new ShooterCommand(shooter, Constants.ShooterConstants.Elevation.kElevationB)
+      new ShooterCommand(shooter)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
     );
 
     operatorController.y().onTrue(
-      new ShooterCommand(shooter, Constants.ShooterConstants.Elevation.kElevationY)
+      new ShooterCommand(shooter)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
     );
 
     operatorController.x().onTrue(
-      new ShooterCommand(shooter, Constants.ShooterConstants.Elevation.kElevationX)
+      new ShooterCommand(shooter)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
     );
 

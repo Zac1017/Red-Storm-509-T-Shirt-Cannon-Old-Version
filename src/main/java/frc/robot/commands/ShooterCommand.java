@@ -14,19 +14,14 @@ public class ShooterCommand extends Command {
 
 
     private final Shooter shooter;
-    private final double elevation;
-    
-    private boolean rotationDone;
-    private boolean elevationDone;
 
-    private Timer stateTimer = new Timer();
+
+    private final Timer stateTimer = new Timer();
 
 
     private enum ShooterState {
-        ZEROING,
-        ELEVATING,
-        ROTATING,
         PRESSURIZING,
+        PRESSURIZED,
         FIRING,
         FINISHED,
         FAULT
@@ -34,111 +29,39 @@ public class ShooterCommand extends Command {
 
     private ShooterState state;
 
-    public ShooterCommand(Shooter shooter, double elevation) {
+    public ShooterCommand(Shooter shooter) {
         this.shooter = shooter;
-        this.elevation = elevation;
-        this.rotationDone = false;
-        this.elevationDone = false;
+
 
 
         addRequirements(shooter);
 
-        // addCommands(
-        
-        //     Commands.runOnce(() -> shooter.elevateShooter(elevation)),
-        //     Commands.runOnce(() -> shooter.rotate(Constants.ShooterConstants.kRotation)),
-        //     Commands.runOnce(() -> shooter.close(shooter.kSealSolenoid)),
-        //     Commands.waitSeconds(2.0),
-        //     Commands.runOnce(() -> shooter.open(shooter.kChargeTankSolenoid)),
-        //     Commands.waitSeconds(2.0),
-        //     Commands.runOnce(() -> shooter.close(shooter.kChargeTankSolenoid)),
-        //     Commands.waitSeconds(1.0),
-        //     Commands.runOnce(() -> shooter.open(shooter.kChamberTankSolenoid)),
-        //     Commands.waitSeconds(2.0),
-        //     Commands.runOnce(() -> shooter.close(shooter.kChamberTankSolenoid)),
-        //     Commands.runOnce(() -> shooter.elevateShooter(Constants.ShooterConstants.kdefaultElevation))
-
-        // );
     }
 
     @Override
     public void initialize() {
-        elevationDone = false;
-        rotationDone = false;
-
-        if (!shooter.hasZeroedPosition) {
-            setState(ShooterState.ZEROING);
-        } else {
-            setState(ShooterState.ELEVATING);
-        }
+        setState(ShooterState.PRESSURIZING);
     }
 
     @Override
     public void execute() {
         switch (state) {
-            case ZEROING:
-                if (shooter.hasZeroedPosition) {
-                    setState(ShooterState.ELEVATING);
-                } else if (stateTimer.hasElapsed(Constants.ShooterConstants.kZeroingTimeout)) setState(ShooterState.FAULT);
-                break;
-            case ELEVATING:
-                if (!elevationDone) {
-                    shooter.elevateShooter(elevation);
-                    elevationDone = true;
-                    
-                }
-                if (shooter.isElevated()) {
-                    setState(ShooterState.ROTATING);
-                }
-                if (shooter.isRotated()) {
-                    shooter.closeSeal();
-                    setState(ShooterState.PRESSURIZING);
-                }
-                
-                // if (shooter.isElevated() && shooter.isReadyToFire()) {
-                //     state = ShooterState.ROTATING;
-                // } else if (stateTimer.hasElapsed(Constants.ShooterConstants.kElevatingTimout)) setState(ShooterState.FAULT);
-                break;
-            case ROTATING:
-                if (!rotationDone) {
-                    shooter.rotateToNextBarrel(Constants.ShooterConstants.kRotation);
-                    rotationDone = true;
-                }
-
-                if (shooter.isRotated() && shooter.isReadyToFire()) {
-                    shooter.closeSeal();
-                    state = ShooterState.PRESSURIZING;
-                } else if (stateTimer.hasElapsed(Constants.ShooterConstants.kRotatingTimeout)) setState(ShooterState.FAULT);
-                break;
             case PRESSURIZING:
-                shooter.openChamber();
-                
                 if (shooter.isAtPressure(Constants.ShooterConstants.kPressureThreshold)) {
-                    shooter.closeChamber();
-                    state = ShooterState.FIRING;
-                } else if (stateTimer.hasElapsed(Constants.ShooterConstants.kPressurizingTimeout)) setState(ShooterState.FAULT);
+                    setState(ShooterState.PRESSURIZED);
+                } else if (stateTimer.hasElapsed(Constants.ShooterConstants.kPressurizingTimeout)) {
+                    setState(ShooterState.FAULT);
+                }
+                break;
+            case PRESSURIZED:
+                setState(ShooterState.FIRING);
                 break;
             case FIRING:
-                shooter.open(shooter.kSealSolenoid);
-
-                if (shooter.getPressure() < 30) {
-                    state = ShooterState.FINISHED;
-                } else if (stateTimer.hasElapsed(Constants.ShooterConstants.kFiringTimeout)) setState(ShooterState.FAULT);
+                if (stateTimer.hasElapsed(Constants.ShooterConstants.kFiringTimeout)) {
+                    setState(ShooterState.FINISHED);
+                }
                 break;
-            case FINISHED:
-                break;
-            case FAULT:
-                shooter.closeSeal();
-                shooter.closeChamber();
-                shooter.stopMotors();
-                break;
-
         }
-    }
-
-    public void setState(ShooterState newState) {
-        state = newState;
-        stateTimer.restart();
     }
 
     @Override
@@ -150,16 +73,33 @@ public class ShooterCommand extends Command {
     public void end(boolean interrupted) {
         shooter.closeSeal();
         shooter.closeChamber();
-        shooter.stopMotors();
-        
-        if (!interrupted && state == ShooterState.FINISHED) {
-            shooter.elevateShooter(Constants.ShooterConstants.kdefaultElevation);
-        }
     }
 
-    @Override
-    public InterruptionBehavior getInterruptionBehavior() {
-        return InterruptionBehavior.kCancelIncoming;
+    private void setState(ShooterState newState) {
+        state = newState;
+        stateTimer.restart();
+
+        switch (newState) {
+            case PRESSURIZING:
+                shooter.closeSeal();
+                shooter.openLeftChamber();
+                shooter.openRightChamber();
+                break;
+            case PRESSURIZED:
+                shooter.closeChamber();
+                break;
+            case FIRING:
+                shooter.open(shooter.kSealSolenoid);
+                break;
+            case FINISHED:
+                shooter.closeSeal();
+                shooter.closeChamber();
+                break;
+            case FAULT:
+                shooter.closeSeal();
+                shooter.closeChamber();
+                break;
+
+        }
     }
-    
 }
