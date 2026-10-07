@@ -70,22 +70,18 @@ public class RobotContainer {
 
     operatorController.a().onTrue(
       new ShooterCommand(shooter)
-      .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
     );
 
     operatorController.b().onTrue(
       new ShooterCommand(shooter)
-      .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
     );
 
     operatorController.y().onTrue(
       new ShooterCommand(shooter)
-      .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
     );
 
     operatorController.x().onTrue(
       new ShooterCommand(shooter)
-      .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
     );
 
     

@@ -33,14 +33,14 @@ public class Shooter extends SubsystemBase {
         solenoid.set(false);
     }
 
-    public boolean isAtPressure(double pressureThreshold) {
-        double pressure = pressureSensor.getPressure(); 
-        return pressure >= pressureThreshold;
-    }
+    // public boolean isAtPressure(double pressureThreshold) {
+    //     double pressure = pressureSensor.getPressure(); 
+    //     return pressure >= pressureThreshold;
+    // }
 
-    public double getPressure() {
-        return pressureSensor.getPressure();
-    }
+    // public double getPressure() {
+    //     return pressureSensor.getPressure();
+    // }
 
     public void openChamber() {
         open(kLeftChamberTankSolenoid);

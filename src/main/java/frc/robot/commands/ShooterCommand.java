@@ -47,10 +47,8 @@ public class ShooterCommand extends Command {
     public void execute() {
         switch (state) {
             case PRESSURIZING:
-                if (shooter.isAtPressure(Constants.ShooterConstants.kPressureThreshold)) {
+                if (stateTimer.hasElapsed(Constants.ShooterConstants.kPressurizingTimeout)) {
                     setState(ShooterState.PRESSURIZED);
-                } else if (stateTimer.hasElapsed(Constants.ShooterConstants.kPressurizingTimeout)) {
-                    setState(ShooterState.FAULT);
                 }
                 break;
             case PRESSURIZED:
@@ -60,6 +58,10 @@ public class ShooterCommand extends Command {
                 if (stateTimer.hasElapsed(Constants.ShooterConstants.kFiringTimeout)) {
                     setState(ShooterState.FINISHED);
                 }
+                break;
+            case FINISHED:
+                break;
+            case FAULT:
                 break;
         }
     }
