@@ -20,40 +20,27 @@ public class Shooter extends SubsystemBase {
     public final Solenoid kRightChamberTankSolenoid = new Solenoid(0, PneumaticsModuleType.CTREPCM, 1);
     public final Solenoid kSealSolenoid = new Solenoid(0, PneumaticsModuleType.CTREPCM, 2);
 
-    
-
     public Shooter() {
         closeSeal();
         closeChamber();
     }
 
-    /**
-     * Opens Solenoid
-     * @param solenoid
-     */
     public void open(Solenoid solenoid) {
         solenoid.set(true);
     }
 
-    /**
-     * Closes Solenoid
-     * @param solenoid
-     */
     public void close(Solenoid solenoid) {
         solenoid.set(false);
     }
 
-    
+    public boolean isAtPressure(double pressureThreshold) {
+        double pressure = pressureSensor.getPressure(); 
+        return pressure >= pressureThreshold;
+    }
 
-    // public boolean isAtPressure(double pressureThreshold) {
-    //     // double pressure = pressureSensor.getPressure(); 
-    //     // return pressure >= pressureThreshold;
-    // }
-
-    // public double getPressure() {
-    //     return pressureSensor.getPressure();
-    // }
-
+    public double getPressure() {
+        return pressureSensor.getPressure();
+    }
 
     public void openChamber() {
         open(kLeftChamberTankSolenoid);
@@ -81,10 +68,5 @@ public class Shooter extends SubsystemBase {
         open(kSealSolenoid);
     }
 
-
-    @Override
-    public void periodic() {
-      
-    }
 }
 
