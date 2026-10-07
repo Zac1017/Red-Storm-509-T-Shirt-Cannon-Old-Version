@@ -89,7 +89,7 @@ public class ShooterCommand extends Command {
                 shooter.closeChamber();
                 break;
             case FIRING:
-                shooter.open(shooter.kSealSolenoid);
+                shooter.openSeal();
                 break;
             case FINISHED:
                 shooter.closeSeal();

@@ -23,6 +23,8 @@ public class Shooter extends SubsystemBase {
     
 
     public Shooter() {
+        closeSeal();
+        closeChamber();
     }
 
     /**
@@ -73,6 +75,10 @@ public class Shooter extends SubsystemBase {
 
     public void closeSeal() {
         close(kSealSolenoid);
+    }
+
+    public void openSeal() {
+        open(kSealSolenoid);
     }
 
 
