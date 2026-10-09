@@ -68,21 +68,8 @@ public class RobotContainer {
       () -> true
     ));
 
-    operatorController.a().onTrue(
-      new ShooterCommand(shooter)
-    );
-
-    operatorController.b().onTrue(
-      new ShooterCommand(shooter)
-    );
-
-    operatorController.y().onTrue(
-      new ShooterCommand(shooter)
-    );
-
-    operatorController.x().onTrue(
-      new ShooterCommand(shooter)
-    );
+    operatorController.rightTrigger().onTrue(new ShooterCommand(shooter));
+    
 
     
     

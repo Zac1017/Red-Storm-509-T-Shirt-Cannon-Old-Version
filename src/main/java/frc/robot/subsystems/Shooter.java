@@ -16,8 +16,8 @@ import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
 
-    public final Solenoid kLeftChamberTankSolenoid = new Solenoid(0, PneumaticsModuleType.CTREPCM, 0); // new Solenoid(module, PneumaticsModuleType, channel);
-    public final Solenoid kRightChamberTankSolenoid = new Solenoid(0, PneumaticsModuleType.CTREPCM, 1);
+    
+    public final Solenoid chamberTankSolenoid = new Solenoid(0, PneumaticsModuleType.CTREPCM, 1);
     public final Solenoid kSealSolenoid = new Solenoid(0, PneumaticsModuleType.CTREPCM, 2);
 
     public Shooter() {
@@ -43,21 +43,11 @@ public class Shooter extends SubsystemBase {
     // }
 
     public void openChamber() {
-        open(kLeftChamberTankSolenoid);
-        open(kRightChamberTankSolenoid);
-    }
-
-    public void openRightChamber() {
-        open(kRightChamberTankSolenoid);
-    }
-
-    public void openLeftChamber() {
-        open(kLeftChamberTankSolenoid);
+        open(chamberTankSolenoid);
     }
 
     public void closeChamber() {
-        close(kLeftChamberTankSolenoid);
-        close(kRightChamberTankSolenoid);
+        close(chamberTankSolenoid);
     }
 
     public void closeSeal() {
