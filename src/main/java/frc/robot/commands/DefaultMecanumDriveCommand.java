@@ -10,20 +10,22 @@ import frc.robot.subsystems.MecanumDrive;
 
 public class DefaultMecanumDriveCommand extends Command {
     private final MecanumDrive mecanum;
-    private final DoubleSupplier forward;
-    private final DoubleSupplier left;
+    private final DoubleSupplier forwardSupplier;
+    private final DoubleSupplier leftSupplier;
 
     public DefaultMecanumDriveCommand(MecanumDrive mecanum, DoubleSupplier forward, DoubleSupplier left) {
         this.mecanum = mecanum;
-        this.forward = forward;
-        this.left = left;
+        this.forwardSupplier = forward;
+        this.leftSupplier = left;
 
         addRequirements(mecanum);
     }
 
     @Override
     public void execute() {
-        mecanum.drive(forward, left);
+        double left = leftSupplier.getAsDouble();
+        double forward = forwardSupplier.getAsDouble();
+        mecanum.drive(left, forward);
     }
 }
 

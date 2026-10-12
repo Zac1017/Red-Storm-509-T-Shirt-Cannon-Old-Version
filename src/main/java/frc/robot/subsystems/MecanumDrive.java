@@ -22,10 +22,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class MecanumDrive extends SubsystemBase {
-    private final SparkMax frontRight = new SparkMax(19, MotorType.kBrushed);
-    private final SparkMax frontLeft = new SparkMax(3, MotorType.kBrushed);
-    private final SparkMax backRight = new SparkMax(10, MotorType.kBrushed);
-    private final SparkMax backLeft = new SparkMax(0, MotorType.kBrushed);
+    private final SparkMax frontRight = new SparkMax(1, MotorType.kBrushed);
+    private final SparkMax frontLeft = new SparkMax(2, MotorType.kBrushed);
+    private final SparkMax backRight = new SparkMax(3, MotorType.kBrushed);
+    private final SparkMax backLeft = new SparkMax(4, MotorType.kBrushed);
 
     public MecanumDrive() {
         SparkMaxConfig frontRightConfig = new SparkMaxConfig();
@@ -52,34 +52,32 @@ public class MecanumDrive extends SubsystemBase {
         // kResetSafeParameters restores defaults first, ensuring a clean setup
         // kPersistParameters burns the settings to the flash memory dynamically
 
-        frontRight.configure(frontRightConfig, 
-            ResetMode.kResetSafeParameters, 
-            PersistMode.kPersistParameters
-        );
+        // frontRight.configure(frontRightConfig, 
+        //     ResetMode.kResetSafeParameters, 
+        //     PersistMode.kPersistParameters
+        // );
 
-        frontLeft.configure(frontLeftConfig,
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters
-        );
+        // frontLeft.configure(frontLeftConfig,
+        //     ResetMode.kResetSafeParameters,
+        //     PersistMode.kPersistParameters
+        // );
 
-        backRight.configure(backRightConfig,
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters
-        );
+        // backRight.configure(backRightConfig,
+        //     ResetMode.kResetSafeParameters,
+        //     PersistMode.kPersistParameters
+        // );
 
-        backLeft.configure(backLeftConfig,
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters
-        );
+        // backLeft.configure(backLeftConfig,
+        //     ResetMode.kResetSafeParameters,
+        //     PersistMode.kPersistParameters
+        // );
 
         
 
 
     }
 
-    public void drive(DoubleSupplier forwardSupplier, DoubleSupplier leftSupplier) {
-        double forward = forwardSupplier.getAsDouble();
-        double left = leftSupplier.getAsDouble();
+    public void drive(double left, double forward) {
         forward = MathUtil.clamp(forward, -1, 1);
         left = MathUtil.clamp(left, -1, 1);
 

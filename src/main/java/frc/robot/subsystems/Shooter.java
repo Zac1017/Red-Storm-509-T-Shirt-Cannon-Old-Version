@@ -17,7 +17,7 @@ import frc.robot.Constants;
 public class Shooter extends SubsystemBase {
 
     
-    public final Solenoid chamberTankSolenoid = new Solenoid(1, PneumaticsModuleType.CTREPCM, 4);
+    public final Solenoid chamberTankSolenoid = new Solenoid(5, PneumaticsModuleType.CTREPCM, 1);
     
 
     public Shooter() {
