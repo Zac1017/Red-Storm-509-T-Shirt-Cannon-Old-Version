@@ -23,8 +23,6 @@ public class ShooterCommand extends Command {
 
     private enum ShooterState {
         PRESSURIZING,
-        PRESSURIZED,
-        CLOSING_CHAMBER,
         FIRING,
         FINISHED,
         FAULT
@@ -61,14 +59,6 @@ public class ShooterCommand extends Command {
         switch (state) {
             case PRESSURIZING:
                 if (stateTimer.hasElapsed(Constants.ShooterConstants.kPressurizingDuration)) {
-                    setState(ShooterState.PRESSURIZED);
-                }
-                break;
-            case PRESSURIZED:
-                setState(ShooterState.CLOSING_CHAMBER);
-                break;
-            case CLOSING_CHAMBER:
-                if (stateTimer.hasElapsed(Constants.ShooterConstants.kChamberClosingDelay)) { 
                     setState(ShooterState.FIRING);
                 }
                 break;
@@ -94,7 +84,6 @@ public class ShooterCommand extends Command {
         commandTimer.stop();
         stateTimer.stop();
         
-        shooter.closeSeal();
         shooter.closeChamber();
     }
 
@@ -106,24 +95,15 @@ public class ShooterCommand extends Command {
 
         switch (newState) {
             case PRESSURIZING:
-                shooter.closeSeal();
-                shooter.openChamber();
-                break;
-            case PRESSURIZED:
-                shooter.closeChamber();
-                break;
-            case CLOSING_CHAMBER:
                 shooter.closeChamber();
                 break;
             case FIRING:
-                shooter.openSeal();
+                shooter.openChamber();
                 break;
             case FINISHED:
-                shooter.closeSeal();
                 shooter.closeChamber();
                 break;
             case FAULT:
-                shooter.closeSeal();
                 shooter.closeChamber();
                 break;
 

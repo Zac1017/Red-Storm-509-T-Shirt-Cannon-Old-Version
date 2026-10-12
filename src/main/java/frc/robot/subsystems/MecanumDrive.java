@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -20,28 +21,13 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class MecanumDrive extends SubsystemBase{
-    private final SparkMax frontRight = new SparkMax(0, MotorType.kBrushed);
-    private final SparkMax frontLeft = new SparkMax(1, MotorType.kBrushed);
-    private final SparkMax backRight = new SparkMax(2, MotorType.kBrushed);
-    private final SparkMax backLeft = new SparkMax(3, MotorType.kBrushed);
+public class MecanumDrive extends SubsystemBase {
+    private final SparkMax frontRight = new SparkMax(19, MotorType.kBrushed);
+    private final SparkMax frontLeft = new SparkMax(3, MotorType.kBrushed);
+    private final SparkMax backRight = new SparkMax(10, MotorType.kBrushed);
+    private final SparkMax backLeft = new SparkMax(0, MotorType.kBrushed);
 
-    private final Translation2d frontLeftLocation = Constants.DriveConstants.Drive.kFrontLeftLocation;
-    private final Translation2d frontRightLocation = Constants.DriveConstants.Drive.kFrontRightLocation;
-    private final Translation2d backLeftLocation = Constants.DriveConstants.Drive.kBackLeftLocation;
-    private final Translation2d backRightLocation = Constants.DriveConstants.Drive.kBackRightLocation;
-
-    private final Pigeon2 pigeon;
-
-    private final MecanumDriveKinematics kinematics = new MecanumDriveKinematics(frontLeftLocation, 
-        frontRightLocation, 
-        backLeftLocation, 
-        backRightLocation
-    );
-
-    public MecanumDrive(Pigeon2 pigeon) {
-        this.pigeon = pigeon;
-
+    public MecanumDrive() {
         SparkMaxConfig frontRightConfig = new SparkMaxConfig();
         SparkMaxConfig frontLeftConfig = new SparkMaxConfig();
         SparkMaxConfig backRightConfig = new SparkMaxConfig();
@@ -49,19 +35,19 @@ public class MecanumDrive extends SubsystemBase{
 
         frontRightConfig.smartCurrentLimit(40).
             idleMode(IdleMode.kCoast).
-            inverted(false);
+            inverted(true);
 
         frontLeftConfig.smartCurrentLimit(40).
             idleMode(IdleMode.kCoast).
-            inverted(true);
+            inverted(false);
 
         backRightConfig.smartCurrentLimit(40).
             idleMode(IdleMode.kCoast).
-            inverted(false);
+            inverted(true);
         
         backLeftConfig.smartCurrentLimit(40).
             idleMode(IdleMode.kCoast).
-            inverted(true);
+            inverted(false);
 
         // kResetSafeParameters restores defaults first, ensuring a clean setup
         // kPersistParameters burns the settings to the flash memory dynamically
@@ -88,37 +74,121 @@ public class MecanumDrive extends SubsystemBase{
 
         
 
-    }
-
-    public void drive(Translation2d translationMetersPerSecond, 
-    double omega, 
-    boolean fieldRelative
-    ) {
-        ChassisSpeeds chassisSpeeds;
-        if (fieldRelative) {
-             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                translationMetersPerSecond.getX(),
-                translationMetersPerSecond.getY(),
-                omega,
-                pigeon.getRotation2d()
-            );
-        } else {
-            chassisSpeeds = new ChassisSpeeds(
-                translationMetersPerSecond.getX(),
-                translationMetersPerSecond.getY(),
-                omega
-            );
-        }
-
-        MecanumDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
-
-        frontLeft.set(wheelSpeeds.frontLeftMetersPerSecond);
-        frontRight.set(wheelSpeeds.frontRightMetersPerSecond);
-        backLeft.set(wheelSpeeds.rearLeftMetersPerSecond);
-        backRight.set(wheelSpeeds.rearRightMetersPerSecond);
-
 
     }
 
+    public void drive(DoubleSupplier forwardSupplier, DoubleSupplier leftSupplier) {
+        double forward = forwardSupplier.getAsDouble();
+        double left = leftSupplier.getAsDouble();
+        forward = MathUtil.clamp(forward, -1, 1);
+        left = MathUtil.clamp(left, -1, 1);
 
+        frontLeft.set(forward - left);
+        backLeft.set(forward - left);
+        frontRight.set(forward + left);
+        backRight.set(forward + left);
+    }
 }
+
+// public class MecanumDrive extends SubsystemBase{
+//     private final SparkMax frontRight = new SparkMax(0, MotorType.kBrushed);
+//     private final SparkMax frontLeft = new SparkMax(1, MotorType.kBrushed);
+//     private final SparkMax backRight = new SparkMax(2, MotorType.kBrushed);
+//     private final SparkMax backLeft = new SparkMax(3, MotorType.kBrushed);
+
+//     private final Translation2d frontLeftLocation = Constants.DriveConstants.Drive.kFrontLeftLocation;
+//     private final Translation2d frontRightLocation = Constants.DriveConstants.Drive.kFrontRightLocation;
+//     private final Translation2d backLeftLocation = Constants.DriveConstants.Drive.kBackLeftLocation;
+//     private final Translation2d backRightLocation = Constants.DriveConstants.Drive.kBackRightLocation;
+
+//     private final Pigeon2 pigeon;
+
+//     private final MecanumDriveKinematics kinematics = new MecanumDriveKinematics(frontLeftLocation, 
+//         frontRightLocation, 
+//         backLeftLocation, 
+//         backRightLocation
+//     );
+
+//     public MecanumDrive(Pigeon2 pigeon) {
+//         this.pigeon = pigeon;
+
+//         SparkMaxConfig frontRightConfig = new SparkMaxConfig();
+//         SparkMaxConfig frontLeftConfig = new SparkMaxConfig();
+//         SparkMaxConfig backRightConfig = new SparkMaxConfig();
+//         SparkMaxConfig backLeftConfig = new SparkMaxConfig();
+
+//         frontRightConfig.smartCurrentLimit(40).
+//             idleMode(IdleMode.kCoast).
+//             inverted(false);
+
+//         frontLeftConfig.smartCurrentLimit(40).
+//             idleMode(IdleMode.kCoast).
+//             inverted(true);
+
+//         backRightConfig.smartCurrentLimit(40).
+//             idleMode(IdleMode.kCoast).
+//             inverted(false);
+        
+//         backLeftConfig.smartCurrentLimit(40).
+//             idleMode(IdleMode.kCoast).
+//             inverted(true);
+
+//         // kResetSafeParameters restores defaults first, ensuring a clean setup
+//         // kPersistParameters burns the settings to the flash memory dynamically
+
+//         frontRight.configure(frontRightConfig, 
+//             ResetMode.kResetSafeParameters, 
+//             PersistMode.kPersistParameters
+//         );
+
+//         frontLeft.configure(frontLeftConfig,
+//             ResetMode.kResetSafeParameters,
+//             PersistMode.kPersistParameters
+//         );
+
+//         backRight.configure(backRightConfig,
+//             ResetMode.kResetSafeParameters,
+//             PersistMode.kPersistParameters
+//         );
+
+//         backLeft.configure(backLeftConfig,
+//             ResetMode.kResetSafeParameters,
+//             PersistMode.kPersistParameters
+//         );
+
+        
+
+//     }
+
+//     public void drive(Translation2d translationMetersPerSecond, 
+//     double omega, 
+//     boolean fieldRelative
+//     ) {
+//         ChassisSpeeds chassisSpeeds;
+//         if (fieldRelative) {
+//              chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+//                 translationMetersPerSecond.getX(),
+//                 translationMetersPerSecond.getY(),
+//                 omega,
+//                 pigeon.getRotation2d()
+//             );
+//         } else {
+//             chassisSpeeds = new ChassisSpeeds(
+//                 translationMetersPerSecond.getX(),
+//                 translationMetersPerSecond.getY(),
+//                 omega
+//             );
+//         }
+
+//         MecanumDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(chassisSpeeds);
+
+//         frontLeft.set(wheelSpeeds.frontLeftMetersPerSecond);
+//         frontRight.set(wheelSpeeds.frontRightMetersPerSecond);
+//         backLeft.set(wheelSpeeds.rearLeftMetersPerSecond);
+//         backRight.set(wheelSpeeds.rearRightMetersPerSecond);
+
+
+//     }
+
+
+// }

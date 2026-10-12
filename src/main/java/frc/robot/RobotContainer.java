@@ -29,7 +29,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   Pigeon2 pigeon = new Pigeon2(0);
-  private final MecanumDrive mecanum = new MecanumDrive(pigeon);
+  private final MecanumDrive mecanum = new MecanumDrive();
   private final Shooter shooter = new Shooter();
 
 
@@ -62,10 +62,10 @@ public class RobotContainer {
     // ));
 
     mecanum.setDefaultCommand(new DefaultMecanumDriveCommand(mecanum,
-      () -> operatorController.getLeftX(),
       () -> operatorController.getLeftY(),
-      () -> operatorController.getRightX(),
-      () -> true
+      () -> operatorController.getLeftX()
+      // () -> operatorController.getRightX(),
+      // () -> true
     ));
 
     operatorController.rightTrigger().onTrue(new ShooterCommand(shooter));

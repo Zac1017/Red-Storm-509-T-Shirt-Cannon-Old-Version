@@ -16,7 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
  */
 public final class Constants {
   public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int kDriverControllerPort = 2;
   }
 
   public static class DriveConstants { 
@@ -56,7 +56,7 @@ public final class Constants {
     public static final double kElevatingTimout = 5.0; //TODO: Find me!
     public static final double kRotatingTimeout = 5.0; //TODO: Find me!
     public static final double kPressurizingDuration = 5.0; //TODO: Find me!
-    public static final double kFiringDuration = 5.0; //TODO: Find me!
+    public static final double kFiringDuration = 1.0; //TODO: Find me!
     public static final double kZeroingTimeout = 5.0; //TODO: Find me!
     public static final double kMaxCommandDuration = 20.0; //TODO: Find me!
     public static final double kChamberClosingDelay = 2.0; //TODO: Find me!

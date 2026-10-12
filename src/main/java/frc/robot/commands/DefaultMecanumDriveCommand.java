@@ -9,31 +9,50 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.MecanumDrive;
 
 public class DefaultMecanumDriveCommand extends Command {
-    
     private final MecanumDrive mecanum;
-    private final DoubleSupplier translationXSupplier;
-    private final DoubleSupplier translationYSupplier;
-    private final DoubleSupplier omegaSupplier;
-    private final BooleanSupplier fieldRelativeSupplier;
+    private final DoubleSupplier forward;
+    private final DoubleSupplier left;
 
-    public DefaultMecanumDriveCommand(MecanumDrive mecanum, DoubleSupplier xSupplier, DoubleSupplier ySupplier, 
-    DoubleSupplier omega, BooleanSupplier fieldRelative) {
-
+    public DefaultMecanumDriveCommand(MecanumDrive mecanum, DoubleSupplier forward, DoubleSupplier left) {
         this.mecanum = mecanum;
-        this.translationXSupplier = xSupplier;
-        this.translationYSupplier = ySupplier;
-        this.omegaSupplier = omega;
-        this.fieldRelativeSupplier = fieldRelative;
+        this.forward = forward;
+        this.left = left;
 
         addRequirements(mecanum);
     }
 
     @Override
     public void execute() {
-        mecanum.drive(new Translation2d(translationXSupplier.getAsDouble(), 
-            translationYSupplier.getAsDouble()), 
-            omegaSupplier.getAsDouble(), 
-            fieldRelativeSupplier.getAsBoolean()
-        );
+        mecanum.drive(forward, left);
     }
 }
+
+// public class DefaultMecanumDriveCommand extends Command {
+    
+//     private final MecanumDrive mecanum;
+//     private final DoubleSupplier translationXSupplier;
+//     private final DoubleSupplier translationYSupplier;
+//     private final DoubleSupplier omegaSupplier;
+//     private final BooleanSupplier fieldRelativeSupplier;
+
+//     public DefaultMecanumDriveCommand(MecanumDrive mecanum, DoubleSupplier xSupplier, DoubleSupplier ySupplier, 
+//     DoubleSupplier omega, BooleanSupplier fieldRelative) {
+
+//         this.mecanum = mecanum;
+//         this.translationXSupplier = xSupplier;
+//         this.translationYSupplier = ySupplier;
+//         this.omegaSupplier = omega;
+//         this.fieldRelativeSupplier = fieldRelative;
+
+//         addRequirements(mecanum);
+//     }
+
+//     @Override
+//     public void execute() {
+//         mecanum.drive(new Translation2d(translationXSupplier.getAsDouble(), 
+//             translationYSupplier.getAsDouble()), 
+//             omegaSupplier.getAsDouble(), 
+//             fieldRelativeSupplier.getAsBoolean()
+//         );
+//     }
+// }
