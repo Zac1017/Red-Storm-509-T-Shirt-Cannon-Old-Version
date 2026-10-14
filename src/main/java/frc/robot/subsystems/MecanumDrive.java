@@ -22,10 +22,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class MecanumDrive extends SubsystemBase {
-    private final SparkMax frontRight = new SparkMax(1, MotorType.kBrushed);
-    private final SparkMax frontLeft = new SparkMax(2, MotorType.kBrushed);
-    private final SparkMax backRight = new SparkMax(3, MotorType.kBrushed);
-    private final SparkMax backLeft = new SparkMax(4, MotorType.kBrushed);
+    private final SparkMax frontRight = new SparkMax(2, MotorType.kBrushed);
+    private final SparkMax frontLeft = new SparkMax(4, MotorType.kBrushed);
+    private final SparkMax backRight = new SparkMax(1, MotorType.kBrushed);
+    private final SparkMax backLeft = new SparkMax(5, MotorType.kBrushed);
 
     public MecanumDrive() {
         SparkMaxConfig frontRightConfig = new SparkMaxConfig();
