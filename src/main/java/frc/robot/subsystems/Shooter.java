@@ -7,6 +7,10 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -16,20 +20,32 @@ import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
 
-    
-    public final Solenoid chamberTankSolenoid = new Solenoid(5, PneumaticsModuleType.CTREPCM, 1);
-    
+                                                           //module is can id
+                                                           //channel is port on pdh
+    // public final Solenoid chamberTankSolenoid = new Solenoid(3, PneumaticsModuleType.CTREPCM, 4);
+    public final SparkMax chamberTankSolenoid = new SparkMax(3, MotorType.kBrushed);
 
     public Shooter() {
+        
+        SparkMaxConfig solenoidConfig = new SparkMaxConfig();
+
+       solenoidConfig.smartCurrentLimit(40).
+            idleMode(IdleMode.kCoast).
+            inverted(true);
+
         closeChamber();
+
+
     }
 
-    public void open(Solenoid solenoid) {
-        solenoid.set(true);
+    public void open(SparkMax motor) {
+        motor.setVoltage(12);
+        SmartDashboard.putBoolean("Shooter", true);
     }
 
-    public void close(Solenoid solenoid) {
-        solenoid.set(false);
+    public void close(SparkMax motor) {
+        motor.setVoltage(0);
+        SmartDashboard.putBoolean("Shooter", false);
     }
 
     // public boolean isAtPressure(double pressureThreshold) {
@@ -45,8 +61,11 @@ public class Shooter extends SubsystemBase {
         open(chamberTankSolenoid);
     }
 
+    public void closeSeal(){}
     public void closeChamber() {
         close(chamberTankSolenoid);
     }
+
+    
 }
 

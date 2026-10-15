@@ -1,8 +1,5 @@
 package frc.robot.commands;
 
-
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,47 +13,56 @@ public class ShooterCommand extends Command {
 
     private final Shooter shooter;
 
-    private final Timer timer = new Timer();
-    
-    // private final Timer stateTimer = new Timer();
-    // private final Timer commandTimer = new Timer();
 
+    private final Timer stateTimer = new Timer();
+    private final Timer commandTimer = new Timer();
 
-    // private enum ShooterState {
-    //     PRESSURIZING,
-    //     FIRING,
-    //     FINISHED,
-    //     FAULT
-    // }
+    private final boolean fire;
 
-    //private ShooterState state;
+    private enum ShooterState {
+        PRESSURIZING,
+        PRESSURIZED,
+        CLOSING_CHAMBER,
+        FIRING,
+        FINISHED,
+        FAULT
+    }
+
+    private ShooterState state;
     // private ShooterState previousState;
 
-    public ShooterCommand(Shooter shooter) {
+    public ShooterCommand(Shooter shooter, boolean fire) {
         this.shooter = shooter;
+        this.fire = fire;
+
+
+
         addRequirements(shooter);
 
     }
 
-    @Override
-    public void initialize() {
+    // @Override
+    // public void initialize() {
+    //     SmartDashboard.putString
+    //     // SmartDashboard.putString("Shooter/Fault", "None");
 
-        timer.restart();
-        // SmartDashboard.putString("Shooter/Fault", "None");
-
-        // commandTimer.restart();
-        // setState(ShooterState.PRESSURIZING);
-    }
+    //     // commandTimer.restart();
+    //     // SmartDashboard.putNumber("command timer", commandTimer.get());
+    //     // setState(ShooterState.PRESSURIZING);
+    // }
 
     @Override
     public void execute() {
+        
+        SmartDashboard.putBoolean("Command Called", true);
+        SmartDashboard.putBoolean("Fire", fire);
+        if (fire) {
         shooter.openChamber();
-
-        if (timer.hasElapsed(Constants.ShooterConstants.kFiringDuration)) {
+        return;
+        } else {
             shooter.closeChamber();
         }
 
-        
         
         // if (state != ShooterState.FINISHED && state != ShooterState.FAULT && commandTimer.hasElapsed(Constants.ShooterConstants.kMaxCommandDuration)) {
         //     SmartDashboard.putString("Shooter/Fault", "Command Timeout");
@@ -67,6 +73,14 @@ public class ShooterCommand extends Command {
         // switch (state) {
         //     case PRESSURIZING:
         //         if (stateTimer.hasElapsed(Constants.ShooterConstants.kPressurizingDuration)) {
+        //             setState(ShooterState.PRESSURIZED);
+        //         }
+        //         break;
+        //     case PRESSURIZED:
+        //         setState(ShooterState.CLOSING_CHAMBER);
+        //         break;
+        //     case CLOSING_CHAMBER:
+        //         if (stateTimer.hasElapsed(Constants.ShooterConstants.kChamberClosingDelay)) { 
         //             setState(ShooterState.FIRING);
         //         }
         //         break;
@@ -82,39 +96,50 @@ public class ShooterCommand extends Command {
         // }
     }
 
-    @Override
-    public boolean isFinished() {
-        return true;
-     //   return state == ShooterState.FINISHED || state == ShooterState.FAULT;
-    }
+    // @Override
+    // public boolean isFinished() {
+    //     return true;
+    //     // return state == ShooterState.FINISHED || state == ShooterState.FAULT;
+    // }
 
-    @Override
-    public void end(boolean interrupted) {
-     //   commandTimer.stop();
-      //  stateTimer.stop();
+    // @Override
+    // // public void end(boolean interrupted) {
+    //     // commandTimer.stop();
+    //     // stateTimer.stop();
         
-        shooter.closeChamber();
-    }
+    //     // shooter.closeSeal();
+    //     shooter.closeChamber();
+    // }
 
-    // private void setState(ShooterState newState) {
-    //     state = newState;
-    //     SmartDashboard.putString("Shooter/State", newState.toString());
-    //     stateTimer.restart();
+    private void setState(ShooterState newState) {
+        state = newState;
+        SmartDashboard.putString("Shooter/State", newState.toString());
+        stateTimer.restart();
         
 
-        // switch (newState) {
-        //     case PRESSURIZING:
-        //         shooter.closeChamber();
-        //         break;
-        //     case FIRING:
-        //         shooter.openChamber();
-        //         break;
-        //     case FINISHED:
-        //         shooter.closeChamber();
-        //         break;
-        //     case FAULT:
-        //         shooter.closeChamber();
-        //         break;
+        switch (newState) {
+            case PRESSURIZING:
+                shooter.closeSeal();
+                shooter.openChamber();
+                break;
+            case PRESSURIZED:
+                shooter.closeChamber();
+                break;
+            case CLOSING_CHAMBER:
+                shooter.closeChamber();
+                break;
+            case FIRING:
+                //shooter.openSeal();
+                break;
+            case FINISHED:
+                shooter.closeSeal();
+                shooter.closeChamber();
+                break;
+            case FAULT:
+                shooter.closeSeal();
+                shooter.closeChamber();
+                break;
 
-        // }
         }
+    }
+}

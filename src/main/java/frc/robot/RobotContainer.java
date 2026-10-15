@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  Pigeon2 pigeon = new Pigeon2(0);
+  // Pigeon2 pigeon = new Pigeon2(0);
   private final MecanumDrive mecanum = new MecanumDrive();
   private final Shooter shooter = new Shooter();
 
@@ -68,8 +68,8 @@ public class RobotContainer {
       // () -> true
     ));
 
-    operatorController.rightTrigger().onTrue(new ShooterCommand(shooter));
-    
+    operatorController.rightTrigger().onTrue(new ShooterCommand(shooter, true));
+    operatorController.rightTrigger().onFalse(new ShooterCommand(shooter, false));
 
     
     
